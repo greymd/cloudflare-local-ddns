@@ -1,0 +1,7 @@
+cloudflare:
+  api_token: your_cloudflare_api_token
+  zone_name: example.com
+  record_name: sub.example.com
+
+network:
+  interface: eth0
