@@ -1,6 +1,7 @@
 import requests
 import subprocess
 import yaml
+import os
 
 def load_config(config_file='config.yaml'):
     with open(config_file, 'r') as file:
@@ -68,8 +69,20 @@ def update_record(api_token, zone_id, record_id, ip_address, record_name):
     response = requests.put(url, headers=headers, json=data)
     if response.status_code == 200:
         print("Record updated successfully")
+        return True
     else:
         print(f"Error updating record: {response.status_code}")
+        return False
+
+def read_cached_ip(cache_file='ip_cache.txt'):
+    if os.path.exists(cache_file):
+        with open(cache_file, 'r') as file:
+            return file.read().strip()
+    return None
+
+def write_cached_ip(ip_address, cache_file='ip_cache.txt'):
+    with open(cache_file, 'w') as file:
+        file.write(ip_address)
 
 def main():
     config = load_config()
@@ -77,14 +90,21 @@ def main():
     zone_name = config['cloudflare']['zone_name']
     record_name = config['cloudflare']['record_name']
     interface = config['network']['interface']
+
     local_ip = get_local_ip(interface)
     if local_ip:
+        cached_ip = read_cached_ip()
+        if cached_ip == local_ip:
+            print(f"Local IP has not changed: {local_ip}")
+            return
+
         print(f"Local IP: {local_ip}")
         zone_id = get_zone_id(api_token, zone_name)
         if zone_id:
             record_id = get_record_id(api_token, zone_id, record_name)
             if record_id:
-                update_record(api_token, zone_id, record_id, local_ip, record_name)
+                if update_record(api_token, zone_id, record_id, local_ip, record_name):
+                    write_cached_ip(local_ip)
 
 if __name__ == "__main__":
     main()
