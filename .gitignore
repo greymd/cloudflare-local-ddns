@@ -1,4 +1,6 @@
 config.yaml
 venv
 ip_cache.txt
+global_ip_cache.txt
+global_config.yaml
 __pycache__/
