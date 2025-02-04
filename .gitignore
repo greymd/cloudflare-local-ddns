@@ -1,3 +1,4 @@
 config.yaml
 venv
 ip_cache.txt
+__pycache__/
