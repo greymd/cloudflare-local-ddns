@@ -22,6 +22,17 @@ def get_local_ip(interface):
         print(f"Error getting local IP: {e}")
         return None
 
+def get_global_ip():
+    url = f"https://checkip.amazonaws.com"
+    headers = {}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        global_ip = response.text
+        return global_ip
+    else:
+        print(f"Error fetching global IP: {response.status_code}")
+        return None
+
 def get_zone_id(api_token, zone_name):
     url = f"https://api.cloudflare.com/client/v4/zones?name={zone_name}"
     headers = {
